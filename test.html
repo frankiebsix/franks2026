@@ -2,27 +2,39 @@
 <html>
 <head><title>API Test</title></head>
 <body style="font-family:monospace;padding:20px;background:#111;color:#ccc;">
-<h3 style="color:#60a5fa">Google Apps Script Connection Test</h3>
-<div id="status" style="color:#fbbf24">Testing...</div>
-<pre id="output" style="margin-top:20px;font-size:11px;color:#4ade80;white-space:pre-wrap;"></pre>
+<h3 style="color:#60a5fa">Google Apps Script Connection Test v2</h3>
+<div id="status" style="color:#fbbf24;margin-bottom:12px;">Testing...</div>
+<div id="raw" style="margin-top:10px;font-size:11px;color:#94a3b8;"></div>
+<pre id="output" style="margin-top:10px;font-size:11px;color:#4ade80;white-space:pre-wrap;word-break:break-all;"></pre>
+
 <script>
 const URL = "https://script.google.com/macros/s/AKfycbx0RgEycGH2LG_7zXKL4cjE8FOVs7CCd9VCHQqlxekaDaLwvNgIl1nG4UlTjC2RJ27Y4g/exec";
+
+// TEST 1: JSONP
 const cbName = '_test_' + Date.now();
 const timeout = setTimeout(() => {
-  document.getElementById('status').textContent = '❌ TIMED OUT after 15s';
+  document.getElementById('status').innerHTML = '❌ JSONP TIMED OUT — script runs but doGet may be crashing silently';
   document.getElementById('status').style.color = '#ff4444';
-}, 15000);
+  document.getElementById('raw').innerHTML = 'Try opening this URL directly in a new tab to see the raw response:<br><a href="'+URL+'" target="_blank" style="color:#60a5fa">'+URL+'</a>';
+}, 10000);
+
 window[cbName] = function(data) {
   clearTimeout(timeout);
-  document.getElementById('status').textContent = '✅ CONNECTED — data received';
+  document.getElementById('status').textContent = '✅ JSONP CONNECTED — data received';
   document.getElementById('status').style.color = '#4ade80';
-  document.getElementById('output').textContent = JSON.stringify(data, null, 2).substring(0, 3000);
+  document.getElementById('output').textContent =
+    'positions count: ' + (data.positions ? data.positions.length : 'MISSING') + '\n' +
+    'log count: ' + (data.log ? data.log.length : 'MISSING') + '\n' +
+    'updated: ' + (data.updated || 'MISSING') + '\n\n' +
+    'First position:\n' + JSON.stringify(data.positions ? data.positions[0] : null, null, 2) + '\n\n' +
+    'Full dump (first 2000 chars):\n' + JSON.stringify(data, null, 2).substring(0, 2000);
 };
+
 const s = document.createElement('script');
 s.src = URL + '?callback=' + cbName + '&t=' + Date.now();
 s.onerror = () => {
   clearTimeout(timeout);
-  document.getElementById('status').textContent = '❌ SCRIPT ERROR — check deployment';
+  document.getElementById('status').textContent = '❌ SCRIPT TAG ERROR';
   document.getElementById('status').style.color = '#ff4444';
 };
 document.head.appendChild(s);
