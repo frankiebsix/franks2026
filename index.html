@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Franks 2026 Growth Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0D1F3C; --blue:#1E4D8C; --ltblue:#D6E4F7; --midblue:#2A6099;
+  --gold:#B8860B; --ltgold:#FFF8E1;
+  --green:#1A5C35; --ltgreen:#E8F5EC;
+  --red:#8B1A1A; --ltred:#FDE8E8;
+  --trigger:#cc1111; --warn:#d97706; --safe:#16a34a;
+  --gray:#F5F5F5; --dkgray:#444; --white:#fff;
+  --bg:#070d1a; --surface:#0d1625; --border:#1a2d45;
+  --text:#c8d8f0; --muted:#4a6080; --bright:#e8f0ff;
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-size:14px;
+}
+
+/* ── LOADING SCREEN ──────────────────────────────────────── */
+#loader{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:1000;transition:opacity .4s;
+}
+#loader.hidden{opacity:0;pointer-events:none;}
+.loader-logo{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:.15em;margin-bottom:32px;}
+.loader-bar-wrap{width:280px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.loader-bar{height:100%;background:linear-gradient(90deg,var(--blue),#60a5fa);width:0;border-radius:2px;animation:loadbar 2s ease forwards;}
+@keyframes loadbar{0%{width:0}60%{width:70%}100%{width:100%}}
+.loader-status{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:16px;letter-spacing:.1em;}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+header{
+  background:linear-gradient(135deg,#080f1e,#0a1628);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.header-left .logo{
+  font-family:'DM Mono',monospace;
+  font-size:11px;font-weight:500;letter-spacing:.2em;
+  color:var(--muted);margin-bottom:4px;
+}
+.header-left .title{
+  font-family:'DM Sans',sans-serif;
+  font-size:18px;font-weight:700;color:var(--bright);letter-spacing:.02em;
+}
+.header-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.updated{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.btn{
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  padding:6px 14px;border-radius:4px;cursor:pointer;letter-spacing:.08em;
+  border:1px solid;transition:all .15s;
+}
+.btn-print{background:#a78bfa18;border-color:#a78bfa40;color:#a78bfa;}
+.btn-print:hover{background:#a78bfa30;}
+.btn-refresh{background:#60a5fa18;border-color:#60a5fa40;color:#60a5fa;}
+.btn-refresh:hover{background:#60a5fa30;}
+
+/* ── ALERT BANNER ────────────────────────────────────────── */
+#alert-banner{
+  background:#1a0505;border-bottom:1px solid #cc111130;
+  padding:8px 24px;display:none;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.alert-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.alert-item{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#ff6666;}
+
+/* ── STAT CARDS ──────────────────────────────────────────── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1px;background:var(--border);
+  border-bottom:1px solid var(--border);
+}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:500px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{
+  background:var(--surface);
+  padding:16px;text-align:center;
+}
+.stat-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:6px;}
+.stat-value{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--bright);}
+.stat-value.red{color:#ff4444;}
+.stat-value.gold{color:#fbbf24;}
+.stat-value.green{color:#4ade80;}
+.stat-value.blue{color:#60a5fa;}
+
+/* ── TABS ────────────────────────────────────────────────── */
+.tabs{
+  display:flex;background:#080d18;
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+}
+.tab{
+  font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;
+  padding:10px 18px;cursor:pointer;border:none;background:none;
+  color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;
+  transition:color .15s;
+}
+.tab.active{color:#60a5fa;border-bottom-color:#60a5fa;}
+.tab:hover:not(.active){color:var(--text);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;
+  color:var(--muted);font-weight:500;
+  padding:8px 10px;border-bottom:1px solid var(--border);
+  text-align:left;white-space:nowrap;background:var(--surface);
+  position:sticky;top:0;
+}
+td{padding:7px 10px;border-bottom:1px solid #0f1825;vertical-align:middle;white-space:nowrap;}
+tr.trigger-row{background:#1a0505 !important;}
+tr.warn-row{background:#1a1200 !important;}
+tr.anchor-row{background:#080f1e !important;}
+tr:hover{background:#0f1a2e !important;}
+
+/* ── BADGES ──────────────────────────────────────────────── */
+.badge{
+  font-family:'DM Mono',monospace;font-size:9px;font-weight:500;
+  padding:2px 8px;border-radius:3px;letter-spacing:.08em;border:1px solid;
+  white-space:nowrap;
+}
+.badge-trigger{background:#cc111115;border-color:#cc111140;color:#ff4444;}
+.badge-warn{background:#d9770615;border-color:#d9770640;color:#fbbf24;}
+.badge-safe{background:#16a34a15;border-color:#16a34a40;color:#4ade80;}
+.badge-anchor{background:#1e4d8c15;border-color:#1e4d8c40;color:#60a5fa;}
+.badge-cash{background:#2a408015;border-color:#2a408040;color:#94a3b8;}
+
+/* ── GAUGE BARS ──────────────────────────────────────────── */
+.gauge{position:relative;height:5px;background:#1a2436;border-radius:3px;min-width:80px;}
+.gauge-fill{position:absolute;left:0;top:0;height:100%;border-radius:3px;transition:width .3s;}
+.gauge-mark{position:absolute;top:-1px;bottom:-1px;width:1px;opacity:.5;}
+
+/* ── LOG ENTRIES ─────────────────────────────────────────── */
+.log-list{padding:16px;display:flex;flex-direction:column;gap:6px;}
+.log-entry{
+  display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;
+  padding:8px 12px;border-radius:4px;border:1px solid var(--border);
+  background:var(--surface);
+}
+.log-entry.hot{border-color:#cc111130;background:#0f0505;}
+.log-entry.athlite{border-color:#16a34a30;background:#050f08;}
+.log-ts{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap;min-width:130px;}
+.log-type{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:1px 7px;border-radius:3px;white-space:nowrap;}
+.log-type.hot{background:#cc111120;color:#ff8888;border:1px solid #cc111140;}
+.log-type.athlite{background:#16a34a20;color:#4ade80;border:1px solid #16a34a40;}
+.log-type.cool{background:#1e4d8c20;color:#60a5fa;border:1px solid #1e4d8c40;}
+.log-msg{font-size:12px;color:var(--text);}
+.log-ticker{font-weight:700;color:var(--bright);}
+
+/* ── BUFFER CARD ─────────────────────────────────────────── */
+.buffer-section{padding:20px;max-width:480px;}
+.buffer-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:20px;
+}
+.buffer-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--bright);font-weight:500;margin-bottom:16px;}
+.buffer-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.buffer-row:last-of-type{border-bottom:none;}
+.buffer-label{font-size:12px;color:var(--muted);}
+.buffer-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--bright);}
+.buffer-note{margin-top:14px;padding:10px;background:#050a14;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.8;}
+
+/* ── ERROR STATE ─────────────────────────────────────────── */
+#error-banner{
+  display:none;background:#1a0808;border:1px solid #cc111130;
+  margin:20px;border-radius:8px;padding:20px;
+}
+.error-title{font-family:'DM Mono',monospace;font-size:12px;color:#ff6666;font-weight:500;margin-bottom:8px;}
+.error-msg{font-size:12px;color:var(--muted);line-height:1.7;}
+.error-url{word-break:break-all;color:#60a5fa;font-family:'DM Mono',monospace;font-size:11px;}
+
+/* ── PRINT STYLES ────────────────────────────────────────── */
+@media print{
+  @page{size:letter portrait;margin:.6in .5in;}
+  body{background:#fff !important;color:#000 !important;font-family:Arial,sans-serif !important;}
+  header,#alert-banner,.tabs,.stats-grid,#error-banner,.btn,#loader{display:none !important;}
+  .tab-panel{display:block !important;}
+  #print-report{display:block !important;}
+  table,th,td{font-size:8.5pt !important;color:#000 !important;}
+  th{background:#0D1F3C !important;color:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  tr.trigger-row td{background:#FDE8E8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  tr.warn-row td{background:#FFF8E1 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .badge{border:1pt solid !important;}
+  .gauge{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loader">
+  <div class="loader-logo">⬡ FRANKS 2026 GROWTH MODEL</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-status" id="loader-status">CONNECTING TO GOOGLE FINANCE...</div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="logo">⬡ ADVISOR USE ONLY · CONFIDENTIAL</div>
+    <div class="title">FRANKS 2026 GROWTH MODEL — 3-2-1 TRACKER</div>
+  </div>
+  <div class="header-right">
+    <div class="updated" id="updated-time">Loading...</div>
+    <button class="btn btn-refresh" onclick="loadData()">↻ REFRESH</button>
+    <button class="btn btn-print" onclick="window.print()">⎙ PRINT</button>
+  </div>
+</header>
+
+<!-- Alert Banner -->
+<div id="alert-banner">
+  <span class="alert-label">ACTIVE TRIGGERS:</span>
+  <span id="alert-items"></span>
+</div>
+
+<!-- Error Banner -->
+<div id="error-banner">
+  <div class="error-title">⚠ COULD NOT CONNECT TO GOOGLE SHEET</div>
+  <div class="error-msg" id="error-msg">
+    Paste your Google Apps Script Web App URL into the SHEET_URL variable at the top of this file.<br><br>
+    How to get your URL:<br>
+    1. Apps Script → Deploy → New Deployment<br>
+    2. Type: Web App · Execute as: Me · Access: Anyone<br>
+    3. Copy the Web App URL and paste it below where it says YOUR_SCRIPT_URL_HERE
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" id="stats-grid">
+  <div class="stat-card"><div class="stat-label">INVESTED</div><div class="stat-value blue" id="stat-invested">—</div></div>
+  <div class="stat-card"><div class="stat-label">ACTIVE TRIGGERS</div><div class="stat-value red" id="stat-triggers">—</div></div>
+  <div class="stat-card"><div class="stat-label">WARNINGS</div><div class="stat-value gold" id="stat-warnings">—</div></div>
+  <div class="stat-card"><div class="stat-label">FTSM ANCHOR</div><div class="stat-value blue" id="stat-ftsm">—</div></div>
+  <div class="stat-card"><div class="stat-label">BUFFER (FTSM+CASH)</div><div class="stat-value" id="stat-buffer">—</div></div>
+  <div class="stat-card"><div class="stat-label">POSITIONS</div><div class="stat-value blue" id="stat-positions">—</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('positions',this)">POSITIONS</button>
+  <button class="tab" onclick="showTab('log',this)" id="log-tab">LOG</button>
+  <button class="tab" onclick="showTab('buffer',this)">BUFFER</button>
+</div>
+
+<!-- Positions Tab -->
+<div class="tab-panel active" id="tab-positions">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>TICKER</th><th>TYPE</th><th>TARGET</th>
+        <th>LIVE PRICE</th><th>ATH</th><th>DROP %</th>
+        <th>STOP GAUGE</th><th>RULE 2</th>
+        <th>CAP GAUGE</th><th>RULE 1</th>
+      </tr></thead>
+      <tbody id="positions-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Log Tab -->
+<div class="tab-panel" id="tab-log">
+  <div class="log-list" id="log-list">
+    <div style="color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;">Loading log...</div>
+  </div>
+</div>
+
+<!-- Buffer Tab -->
+<div class="tab-panel" id="tab-buffer">
+  <div class="buffer-section">
+    <div class="buffer-card">
+      <div class="buffer-title">RULE 3 · YIELD FLOOR STATUS</div>
+      <div class="buffer-row"><span class="buffer-label">FTSM Weight</span><span class="buffer-val" id="buf-ftsm">—</span></div>
+      <div class="buffer-row"><span class="buffer-label">Cash Weight</span><span class="buffer-val" id="buf-cash">—</span></div>
+      <div class="buffer-row"><span class="buffer-label">Combined Buffer</span><span class="buffer-val" id="buf-total">—</span></div>
+      <div class="buffer-row"><span class="buffer-label">Status</span><span id="buf-status">—</span></div>
+      <div class="buffer-note">
+        ORANGE ALERT threshold: FTSM + Cash below 6% of portfolio.<br>
+        Refill at quarterly rebalance. Never sell growth stocks for income.<br>
+        Rebalance dates: Jan 1 · Apr 1 · Jul 1 · Oct 1
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// !! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!
+// ═══════════════════════════════════════════════════════════════
+const SHEET_URL = "YOUR_SCRIPT_URL_HERE";
+// ═══════════════════════════════════════════════════════════════
+
+let portfolioData = null;
+
+// ── FETCH DATA FROM GOOGLE SHEET ──────────────────────────────
+async function loadData() {
+  const loader = document.getElementById('loader');
+  const status = document.getElementById('loader-status');
+  const errBanner = document.getElementById('error-banner');
+
+  if (!SHEET_URL || SHEET_URL === "YOUR_SCRIPT_URL_HERE") {
+    errBanner.style.display = "block";
+    loader.classList.add('hidden');
+    return;
+  }
+
+  status.textContent = "FETCHING LIVE PRICES...";
+
+  try {
+    // Use a CORS proxy approach via the script's own URL
+    const url = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 'callback=_cb&t=' + Date.now();
+
+    const data = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Timeout')), 15000);
+      window._cb = (d) => { clearTimeout(timeout); resolve(d); };
+      const script = document.createElement('script');
+      script.src = url;
+      script.onerror = () => { clearTimeout(timeout); reject(new Error('Network error')); };
+      document.head.appendChild(script);
+    });
+
+    portfolioData = data;
+    render(data);
+    errBanner.style.display = "none";
+    status.textContent = "LOADED";
+    loader.classList.add('hidden');
+
+  } catch(e) {
+    // Fallback: try direct fetch (works when hosted on same domain or CORS enabled)
+    try {
+      status.textContent = "TRYING DIRECT FETCH...";
+      const res  = await fetch(SHEET_URL + '?t=' + Date.now());
+      const data = await res.json();
+      portfolioData = data;
+      render(data);
+      errBanner.style.display = "none";
+      loader.classList.add('hidden');
+    } catch(e2) {
+      errBanner.style.display = "block";
+      document.getElementById('error-msg').innerHTML =
+        `Could not load data. Error: ${e2.message}<br><br>` +
+        `Make sure your Web App deployment has Access set to <strong>"Anyone"</strong>.<br>` +
+        `Your URL: <span class="error-url">${SHEET_URL}</span>`;
+      loader.classList.add('hidden');
+    }
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render(data) {
+  const positions = data.positions || [];
+
+  // Stats
+  const invested   = positions.filter(p=>p.type!=="Cash").reduce((s,p)=>s+p.weight,0);
+  const triggers   = positions.filter(p=>p.stopStatus==="TRIGGER"||p.capStatus==="TRIGGER");
+  const warnings   = positions.filter(p=>(p.stopStatus==="WARNING"||p.capStatus==="WARNING")&&p.stopStatus!=="TRIGGER"&&p.capStatus!=="TRIGGER");
+  const ftsmW      = positions.filter(p=>p.type==="Anchor").reduce((s,p)=>s+p.weight,0);
+  const cashW      = positions.filter(p=>p.type==="Cash").reduce((s,p)=>s+p.weight,0);
+  const bufferW    = ftsmW + cashW;
+  const bufStatus  = bufferW < 0.06 ? "ALERT" : bufferW < 0.10 ? "WARNING" : "SAFE";
+
+  document.getElementById('stat-invested').textContent  = (invested*100).toFixed(0)+'%';
+  document.getElementById('stat-triggers').textContent  = triggers.length;
+  document.getElementById('stat-warnings').textContent  = warnings.length;
+  document.getElementById('stat-ftsm').textContent      = (ftsmW*100).toFixed(1)+'%';
+  document.getElementById('stat-buffer').textContent    = (bufferW*100).toFixed(1)+'%';
+  document.getElementById('stat-positions').textContent = positions.length;
+
+  // Stat colors
+  document.getElementById('stat-triggers').className = 'stat-value ' + (triggers.length>0?'red':'green');
+  document.getElementById('stat-warnings').className = 'stat-value ' + (warnings.length>0?'gold':'green');
+  document.getElementById('stat-buffer').className   = 'stat-value ' + (bufStatus==='ALERT'?'red':bufStatus==='WARNING'?'gold':'green');
+
+  // Updated time
+  const upd = new Date(data.updated);
+  document.getElementById('updated-time').textContent =
+    'DATA FROM: ' + upd.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) +
+    ' ' + upd.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+  // Alert banner
+  if (triggers.length > 0) {
+    document.getElementById('alert-banner').style.display = 'flex';
+    document.getElementById('alert-items').innerHTML = triggers.map(p =>
+      `<span class="alert-item">${p.ticker} ${p.stopStatus==='TRIGGER'&&p.dropPct?(Math.round(p.dropPct*100))+'% DOWN':''} ${p.capStatus==='TRIGGER'?'AT CAP':''}</span>`
+    ).join('');
+  }
+
+  // Positions table
+  let tbody = '';
+  positions.forEach(p => {
+    const isAnchor = p.type === 'Anchor';
+    const isCash   = p.type === 'Cash';
+    const isTrigger = p.stopStatus==='TRIGGER' || p.capStatus==='TRIGGER';
+    const isWarn    = !isTrigger && (p.stopStatus==='WARNING' || p.capStatus==='WARNING');
+    const rowClass  = isTrigger ? 'trigger-row' : isWarn ? 'warn-row' : isAnchor||isCash ? 'anchor-row' : '';
+
+    const dropPct = p.dropPct != null ? p.dropPct : null;
+    const dropTxt = (isAnchor||isCash) ? '<span style="color:var(--muted)">—</span>'
+      : dropPct==null ? '—'
+      : dropPct>0 ? `<span style="color:${dropPct>=0.20?'#ff4444':dropPct>=0.15?'#fbbf24':'#94a3b8'}">▼${(dropPct*100).toFixed(1)}%</span>`
+      : `<span style="color:#4ade80">▲${(Math.abs(dropPct)*100).toFixed(1)}%</span>`;
+
+    const stopBadge = (isAnchor||isCash) ? ''
+      : p.stopStatus==='TRIGGER' ? '<span class="badge badge-trigger">TRIGGER</span>'
+      : p.stopStatus==='WARNING' ? '<span class="badge badge-warn">WATCH</span>'
+      : '<span class="badge badge-safe">SAFE</span>';
+
+    const capBadge = p.capStatus==='TRIGGER' ? '<span class="badge badge-trigger">TRIGGER</span>'
+      : p.capStatus==='WARNING' ? '<span class="badge badge-warn">WATCH</span>'
+      : '<span class="badge badge-safe">SAFE</span>';
+
+    // Stop gauge (0-30% range, warn at 15, trigger at 20)
+    const stopGauge = (isAnchor||isCash) ? '' : (() => {
+      const val = Math.min(30, Math.max(0, (dropPct||0)*100));
+      const pct = (val/30)*100;
+      const col = val>=20?'#cc1111':val>=15?'#d97706':'#16a34a';
+      return `<div class="gauge"><div class="gauge-fill" style="width:${pct}%;background:${col}"></div>
+        <div class="gauge-mark" style="left:${(15/30)*100}%;background:#d97706"></div>
+        <div class="gauge-mark" style="left:${(20/30)*100}%;background:#cc1111"></div></div>`;
+    })();
+
+    // Cap gauge (0-12% range, warn at 8.5, trigger at 10)
+    const capVal = Math.min(12, (p.weight||0)*100);
+    const capPct = (capVal/12)*100;
+    const capCol = capVal>=10?'#cc1111':capVal>=8.5?'#d97706':'#16a34a';
+    const capGauge = `<div class="gauge"><div class="gauge-fill" style="width:${capPct}%;background:${capCol}"></div>
+      <div class="gauge-mark" style="left:${(8.5/12)*100}%;background:#d97706"></div>
+      <div class="gauge-mark" style="left:${(10/12)*100}%;background:#cc1111"></div></div>`;
+
+    const typeBadge = isAnchor ? '<span class="badge badge-anchor">ANCHOR ⚓</span>'
+      : isCash ? '<span class="badge badge-cash">CASH</span>'
+      : `<span style="color:var(--muted);font-size:11px">${p.type}</span>`;
+
+    const priceTxt = p.price ? '$'+p.price.toFixed(2) : '<span style="color:var(--muted)">—</span>';
+    const athTxt   = p.ath   ? '$'+p.ath.toFixed(2)   : '<span style="color:var(--muted)">—</span>';
+    const wPct     = ((p.weight||0)*100).toFixed(1)+'%';
+    const wColor   = p.capStatus==='TRIGGER'?'color:#ff4444':p.capStatus==='WARNING'?'color:#fbbf24':'';
+
+    tbody += `<tr class="${rowClass}">
+      <td style="font-family:'DM Mono',monospace;font-weight:500;color:var(--bright)">${p.ticker}</td>
+      <td>${typeBadge}</td>
+      <td style="font-family:'DM Mono',monospace;${wColor}">${wPct}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--bright)">${priceTxt}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--muted)">${athTxt}</td>
+      <td>${dropTxt}</td>
+      <td>${stopGauge}</td>
+      <td>${stopBadge}</td>
+      <td>${capGauge}</td>
+      <td>${capBadge}</td>
+    </tr>`;
+  });
+  document.getElementById('positions-body').innerHTML = tbody;
+
+  // Buffer tab
+  document.getElementById('buf-ftsm').textContent  = (ftsmW*100).toFixed(1)+'%';
+  document.getElementById('buf-cash').textContent  = (cashW*100).toFixed(1)+'%';
+  document.getElementById('buf-total').textContent = (bufferW*100).toFixed(1)+'%';
+  const bufEl = document.getElementById('buf-status');
+  bufEl.className = 'badge ' + (bufStatus==='ALERT'?'badge-trigger':bufStatus==='WARNING'?'badge-warn':'badge-safe');
+  bufEl.textContent = bufStatus;
+
+  // Log tab
+  const log = data.log || [];
+  document.getElementById('log-tab').textContent = `LOG (${log.length})`;
+  let logHtml = '';
+  if (!log.length) {
+    logHtml = '<div style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:11px;">No log entries yet.</div>';
+  } else {
+    log.forEach(e => {
+      const isHot = e.type&&(e.type.includes('TRIGGER')||e.type.includes('RULE2')||e.type.includes('STOP'));
+      const isATH = e.type&&e.type.includes('ATH');
+      const cls   = isHot?'hot':isATH?'athlite':'';
+      const typeCls = isHot?'hot':isATH?'athlite':'cool';
+      const ts = e.ts ? new Date(e.ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+      logHtml += `<div class="log-entry ${cls}">
+        <span class="log-ts">${ts}</span>
+        <span class="log-type ${typeCls}">${e.type||''}</span>
+        <span class="log-msg">${e.ticker?`<span class="log-ticker">${e.ticker} </span>`:''} ${e.price?'@ $'+e.price+' ':''} ${e.notes||''}</span>
+      </div>`;
+    });
+  }
+  document.getElementById('log-list').innerHTML = logHtml;
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
