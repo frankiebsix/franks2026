@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head><title>API Test</title></head>
+<body style="font-family:monospace;padding:20px;background:#111;color:#ccc;">
+<h3 style="color:#60a5fa">Google Apps Script Connection Test</h3>
+<div id="status" style="color:#fbbf24">Testing...</div>
+<pre id="output" style="margin-top:20px;font-size:11px;color:#4ade80;white-space:pre-wrap;"></pre>
+<script>
+const URL = "https://script.google.com/macros/s/AKfycbx0RgEycGH2LG_7zXKL4cjE8FOVs7CCd9VCHQqlxekaDaLwvNgIl1nG4UlTjC2RJ27Y4g/exec";
+const cbName = '_test_' + Date.now();
+const timeout = setTimeout(() => {
+  document.getElementById('status').textContent = '❌ TIMED OUT after 15s';
+  document.getElementById('status').style.color = '#ff4444';
+}, 15000);
+window[cbName] = function(data) {
+  clearTimeout(timeout);
+  document.getElementById('status').textContent = '✅ CONNECTED — data received';
+  document.getElementById('status').style.color = '#4ade80';
+  document.getElementById('output').textContent = JSON.stringify(data, null, 2).substring(0, 3000);
+};
+const s = document.createElement('script');
+s.src = URL + '?callback=' + cbName + '&t=' + Date.now();
+s.onerror = () => {
+  clearTimeout(timeout);
+  document.getElementById('status').textContent = '❌ SCRIPT ERROR — check deployment';
+  document.getElementById('status').style.color = '#ff4444';
+};
+document.head.appendChild(s);
+</script>
+</body>
+</html>
