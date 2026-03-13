@@ -237,7 +237,7 @@ tr:hover{background:#0f1a2e !important;}
     How to get your URL:<br>
     1. Apps Script → Deploy → New Deployment<br>
     2. Type: Web App · Execute as: Me · Access: Anyone<br>
-    3. Copy the Web App URL and paste it below where it says https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec
+    3. Copy the Web App URL and paste it below where it says https://script.google.com/macros/s/AKfycbzlw2x9BJsLJOD23yhB-U3fp3B98RrdRXLaC7DJbr9jjU6OOlP7VZ1MM_AORrbbaJp0pw/exec
   </div>
 </div>
 
@@ -302,18 +302,18 @@ tr:hover{background:#0f1a2e !important;}
 // ═══════════════════════════════════════════════════════════════
 // !! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!
 // ═══════════════════════════════════════════════════════════════
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzlw2x9BJsLJOD23yhB-U3fp3B98RrdRXLaC7DJbr9jjU6OOlP7VZ1MM_AORrbbaJp0pw/exec";
 // ═══════════════════════════════════════════════════════════════
 
 let portfolioData = null;
 
-// ── FETCH DATA FROM GOOGLE SHEET ──────────────────────────────
-async function loadData() {
-  const loader = document.getElementById('loader');
-  const status = document.getElementById('loader-status');
+// ── FETCH DATA VIA JSONP (bypasses CORS) ─────────────────────
+function loadData() {
+  const loader    = document.getElementById('loader');
+  const status    = document.getElementById('loader-status');
   const errBanner = document.getElementById('error-banner');
 
-  if (!SHEET_URL || SHEET_URL === "https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec") {
+  if (!SHEET_URL || SHEET_URL === "https://script.google.com/macros/s/AKfycbzlw2x9BJsLJOD23yhB-U3fp3B98RrdRXLaC7DJbr9jjU6OOlP7VZ1MM_AORrbbaJp0pw/exec") {
     errBanner.style.display = "block";
     loader.classList.add('hidden');
     return;
@@ -321,44 +321,46 @@ async function loadData() {
 
   status.textContent = "FETCHING LIVE PRICES...";
 
-  try {
-    // Use a CORS proxy approach via the script's own URL
-    const url = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 'callback=_cb&t=' + Date.now();
+  // Remove any previous JSONP script tags
+  const old = document.getElementById('jsonp-script');
+  if (old) old.remove();
 
-    const data = await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Timeout')), 15000);
-      window._cb = (d) => { clearTimeout(timeout); resolve(d); };
-      const script = document.createElement('script');
-      script.src = url;
-      script.onerror = () => { clearTimeout(timeout); reject(new Error('Network error')); };
-      document.head.appendChild(script);
-    });
+  // Set a unique callback name
+  const cbName = '_gsCallback_' + Date.now();
 
+  const timeout = setTimeout(() => {
+    delete window[cbName];
+    errBanner.style.display = "block";
+    document.getElementById('error-msg').innerHTML =
+      'Request timed out after 15 seconds.<br><br>' +
+      'Check that your Web App is deployed with <strong>Access: Anyone</strong>.<br>' +
+      'Then do <strong>Deploy → Manage Deployments</strong> and confirm it shows "Anyone".<br><br>' +
+      '<strong>Important:</strong> After changing access settings you must create a <em>new</em> deployment.';
+    loader.classList.add('hidden');
+  }, 15000);
+
+  window[cbName] = function(data) {
+    clearTimeout(timeout);
+    delete window[cbName];
     portfolioData = data;
     render(data);
     errBanner.style.display = "none";
-    status.textContent = "LOADED";
     loader.classList.add('hidden');
+  };
 
-  } catch(e) {
-    // Fallback: try direct fetch (works when hosted on same domain or CORS enabled)
-    try {
-      status.textContent = "TRYING DIRECT FETCH...";
-      const res  = await fetch(SHEET_URL + '?t=' + Date.now());
-      const data = await res.json();
-      portfolioData = data;
-      render(data);
-      errBanner.style.display = "none";
-      loader.classList.add('hidden');
-    } catch(e2) {
-      errBanner.style.display = "block";
-      document.getElementById('error-msg').innerHTML =
-        `Could not load data. Error: ${e2.message}<br><br>` +
-        `Make sure your Web App deployment has Access set to <strong>"Anyone"</strong>.<br>` +
-        `Your URL: <span class="error-url">${SHEET_URL}</span>`;
-      loader.classList.add('hidden');
-    }
-  }
+  const script  = document.createElement('script');
+  script.id     = 'jsonp-script';
+  script.src    = SHEET_URL + '?callback=' + cbName + '&t=' + Date.now();
+  script.onerror = () => {
+    clearTimeout(timeout);
+    delete window[cbName];
+    errBanner.style.display = "block";
+    document.getElementById('error-msg').innerHTML =
+      'Network error — could not reach Google Apps Script.<br><br>' +
+      'Confirm the script URL is correct and the deployment is active.';
+    loader.classList.add('hidden');
+  };
+  document.head.appendChild(script);
 }
 
 // ── RENDER ────────────────────────────────────────────────────
