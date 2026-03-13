@@ -237,7 +237,7 @@ tr:hover{background:#0f1a2e !important;}
     How to get your URL:<br>
     1. Apps Script → Deploy → New Deployment<br>
     2. Type: Web App · Execute as: Me · Access: Anyone<br>
-    3. Copy the Web App URL and paste it below where it says https://script.google.com/macros/s/AKfycbx0RgEycGH2LG_7zXKL4cjE8FOVs7CCd9VCHQqlxekaDaLwvNgIl1nG4UlTjC2RJ27Y4g/exec
+    3. Copy the Web App URL and paste it below where it says https://script.google.com/macros/s/AKfycbwG_XcRdeEwgnTTNI51CR_dxpWCqEOo0tZFPr9rawpyTjz3yz2b00-n1251OeUybiVlZg/exec
   </div>
 </div>
 
@@ -302,7 +302,7 @@ tr:hover{background:#0f1a2e !important;}
 // ═══════════════════════════════════════════════════════════════
 // !! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!
 // ═══════════════════════════════════════════════════════════════
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbx0RgEycGH2LG_7zXKL4cjE8FOVs7CCd9VCHQqlxekaDaLwvNgIl1nG4UlTjC2RJ27Y4g/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwG_XcRdeEwgnTTNI51CR_dxpWCqEOo0tZFPr9rawpyTjz3yz2b00-n1251OeUybiVlZg/exec";
 // ═══════════════════════════════════════════════════════════════
 
 let portfolioData = null;
@@ -313,7 +313,7 @@ function loadData() {
   const status    = document.getElementById('loader-status');
   const errBanner = document.getElementById('error-banner');
 
-  if (!SHEET_URL || SHEET_URL === "https://script.google.com/macros/s/AKfycbx0RgEycGH2LG_7zXKL4cjE8FOVs7CCd9VCHQqlxekaDaLwvNgIl1nG4UlTjC2RJ27Y4g/exec") {
+  if (!SHEET_URL || SHEET_URL === "YOUR_SCRIPT_URL_HERE") {
     errBanner.style.display = "block";
     loader.classList.add('hidden');
     return;
@@ -331,11 +331,7 @@ function loadData() {
   const timeout = setTimeout(() => {
     delete window[cbName];
     errBanner.style.display = "block";
-    document.getElementById('error-msg').innerHTML =
-      'Request timed out after 15 seconds.<br><br>' +
-      'Check that your Web App is deployed with <strong>Access: Anyone</strong>.<br>' +
-      'Then do <strong>Deploy → Manage Deployments</strong> and confirm it shows "Anyone".<br><br>' +
-      '<strong>Important:</strong> After changing access settings you must create a <em>new</em> deployment.';
+    showError('Timed out — script did not respond. Check deployment has Access: Anyone.');
     loader.classList.add('hidden');
   }, 15000);
 
@@ -354,13 +350,34 @@ function loadData() {
   script.onerror = () => {
     clearTimeout(timeout);
     delete window[cbName];
-    errBanner.style.display = "block";
-    document.getElementById('error-msg').innerHTML =
-      'Network error — could not reach Google Apps Script.<br><br>' +
-      'Confirm the script URL is correct and the deployment is active.';
-    loader.classList.add('hidden');
+    // Script tag error — but don't show error yet, try direct fetch fallback
+    fetch(SHEET_URL + '?t=' + Date.now())
+      .then(r => r.text())
+      .then(text => {
+        // Try to parse — may be JSON without callback wrapper
+        try {
+          const data = JSON.parse(text);
+          portfolioData = data;
+          render(data);
+          errBanner.style.display = "none";
+        } catch(e) {
+          showError('Response was not valid JSON: ' + text.substring(0, 200));
+        }
+        loader.classList.add('hidden');
+      })
+      .catch(() => {
+        showError('Network error — could not reach Google Apps Script.');
+        loader.classList.add('hidden');
+      });
   };
   document.head.appendChild(script);
+}
+
+function showError(msg) {
+  const errBanner = document.getElementById('error-banner');
+  errBanner.style.display = "block";
+  document.getElementById('error-msg').innerHTML = msg +
+    '<br><br>URL in use: <span class="error-url">' + SHEET_URL + '</span>';
 }
 
 // ── RENDER ────────────────────────────────────────────────────
