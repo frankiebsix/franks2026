@@ -237,7 +237,7 @@ tr:hover{background:#0f1a2e !important;}
     How to get your URL:<br>
     1. Apps Script → Deploy → New Deployment<br>
     2. Type: Web App · Execute as: Me · Access: Anyone<br>
-    3. Copy the Web App URL and paste it below where it says YOUR_SCRIPT_URL_HERE
+    3. Copy the Web App URL and paste it below where it says https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec
   </div>
 </div>
 
@@ -302,7 +302,7 @@ tr:hover{background:#0f1a2e !important;}
 // ═══════════════════════════════════════════════════════════════
 // !! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!
 // ═══════════════════════════════════════════════════════════════
-const SHEET_URL = https://script.google.com/macros/s/AKfycbyE4aUUzRbuOxrFxbXmRLAt1DCVdhGsTuz8sgLWndInK9Puxtx5mmTfzjxv7aHu4ZCmkA/exec;
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec";
 // ═══════════════════════════════════════════════════════════════
 
 let portfolioData = null;
@@ -313,7 +313,7 @@ async function loadData() {
   const status = document.getElementById('loader-status');
   const errBanner = document.getElementById('error-banner');
 
-  if (!SHEET_URL || SHEET_URL === "YOUR_SCRIPT_URL_HERE") {
+  if (!SHEET_URL || SHEET_URL === "https://script.google.com/macros/s/AKfycbyqNQsSrRDwLO5pArdm0tnhKc0xBB8UkML9vF4FHJFvhht7ztEJsij9QkZrt0HBEH2xiQ/exec") {
     errBanner.style.display = "block";
     loader.classList.add('hidden');
     return;
