@@ -1,0 +1,41 @@
+
+name: Update Growth Model Prices
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 23 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install market data packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "yfinance>=0.2.65,<2" pandas
+
+      - name: Calculate latest market highs
+        run: python update_prices.py
+
+      - name: Commit updated prices
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prices.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update portfolio price and high data"
+            git push
+          fi
