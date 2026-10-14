@@ -83,9 +83,6 @@ for symbol in SYMBOLS:
         if symbol in previous:
             holdings[symbol] = previous[symbol]
 
-# Private SpaceX Class A shares:
-# Never substitute an unrelated public ticker.
-holdings["SPCX"] = {}
 
 if not any("price" in x for x in holdings.values()):
     raise RuntimeError("No usable prices available")
