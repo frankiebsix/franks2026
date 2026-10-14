@@ -11,7 +11,7 @@ SYMBOLS = [
     "AMZN", "AVGO", "BE", "CAT", "CIBR", "COHR",
     "CRWD", "DRAM", "FTSM", "GLW", "GOOG", "GRID",
     "GRNY", "GS", "IONQ", "LITE", "LLY", "META",
-    "MSFT", "MU", "NVDA", "PLTR", "SNDK"
+    "MSFT", "MU", "NVDA", "PLTR", "SNDK","SPCX"
 ]
 
 OUTPUT = Path("prices.json")
