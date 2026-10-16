@@ -1,197 +1,197 @@
 {
-  "asOf": "2026-10-15 01:37 UTC",
+  "asOf": "2026-10-16 01:32 UTC",
   "holdings": {
     "AMZN": {
-      "price": 254.08,
+      "price": 254.76,
       "ath": 287.2,
       "high52": 287.2,
-      "belowATH": 11.532,
-      "below52": 11.532,
-      "priceDate": "2026-10-14"
+      "belowATH": 11.2953,
+      "below52": 11.2953,
+      "priceDate": "2026-10-15"
     },
     "AVGO": {
-      "price": 346.25,
+      "price": 344.33,
       "ath": 495.0,
       "high52": 495.0,
-      "belowATH": 30.0505,
-      "below52": 30.0505,
-      "priceDate": "2026-10-14"
+      "belowATH": 30.4384,
+      "below52": 30.4384,
+      "priceDate": "2026-10-15"
     },
     "BE": {
-      "price": 239.34,
+      "price": 236.3,
       "ath": 351.28,
       "high52": 351.28,
-      "belowATH": 31.8663,
-      "below52": 31.8663,
-      "priceDate": "2026-10-14"
+      "belowATH": 32.7317,
+      "below52": 32.7317,
+      "priceDate": "2026-10-15"
     },
     "CAT": {
-      "price": 748.98,
+      "price": 735.64,
       "ath": 1073.46,
       "high52": 1073.46,
-      "belowATH": 30.2275,
-      "below52": 30.2275,
-      "priceDate": "2026-10-14"
+      "belowATH": 31.4702,
+      "below52": 31.4702,
+      "priceDate": "2026-10-15"
     },
     "CIBR": {
-      "price": 103.74,
+      "price": 103.53,
       "ath": 110.68,
       "high52": 110.68,
-      "belowATH": 6.2703,
-      "below52": 6.2703,
-      "priceDate": "2026-10-14"
+      "belowATH": 6.4601,
+      "below52": 6.4601,
+      "priceDate": "2026-10-15"
     },
     "COHR": {
-      "price": 263.32,
+      "price": 250.6,
       "ath": 440.0,
       "high52": 440.0,
-      "belowATH": 40.1545,
-      "below52": 40.1545,
-      "priceDate": "2026-10-14"
+      "belowATH": 43.0455,
+      "below52": 43.0455,
+      "priceDate": "2026-10-15"
     },
     "CRWD": {
-      "price": 249.29,
+      "price": 244.57,
       "ath": 286.99,
       "high52": 286.99,
-      "belowATH": 13.1363,
-      "below52": 13.1363,
-      "priceDate": "2026-10-14"
+      "belowATH": 14.781,
+      "below52": 14.781,
+      "priceDate": "2026-10-15"
     },
     "DRAM": {
-      "price": 50.14,
+      "price": 49.33,
       "ath": 81.34,
       "high52": 81.34,
-      "belowATH": 38.3575,
-      "below52": 38.3575,
-      "priceDate": "2026-10-14"
+      "belowATH": 39.3533,
+      "below52": 39.3533,
+      "priceDate": "2026-10-15"
     },
     "FTSM": {
-      "price": 59.64,
+      "price": 59.65,
       "ath": 72.28,
       "high52": 60.91,
-      "belowATH": 17.4875,
-      "below52": 2.085,
-      "priceDate": "2026-10-14"
+      "belowATH": 17.4737,
+      "below52": 2.0686,
+      "priceDate": "2026-10-15"
     },
     "GLW": {
-      "price": 140.89,
+      "price": 138.43,
       "ath": 271.78,
       "high52": 271.78,
-      "belowATH": 48.1603,
-      "below52": 48.1603,
-      "priceDate": "2026-10-14"
+      "belowATH": 49.0654,
+      "below52": 49.0654,
+      "priceDate": "2026-10-15"
     },
     "GOOG": {
-      "price": 343.65,
+      "price": 344.91,
       "ath": 404.47,
       "high52": 404.47,
-      "belowATH": 15.037,
-      "below52": 15.037,
-      "priceDate": "2026-10-14"
+      "belowATH": 14.7254,
+      "below52": 14.7254,
+      "priceDate": "2026-10-15"
     },
     "GRID": {
-      "price": 174.48,
+      "price": 172.11,
       "ath": 199.99,
       "high52": 199.99,
-      "belowATH": 12.7556,
-      "below52": 12.7556,
-      "priceDate": "2026-10-14"
+      "belowATH": 13.9407,
+      "below52": 13.9407,
+      "priceDate": "2026-10-15"
     },
     "GRNY": {
-      "price": 27.66,
+      "price": 27.72,
       "ath": 28.88,
       "high52": 28.88,
-      "belowATH": 4.2244,
-      "below52": 4.2244,
-      "priceDate": "2026-10-14"
+      "belowATH": 4.0166,
+      "below52": 4.0166,
+      "priceDate": "2026-10-15"
     },
     "GS": {
-      "price": 878.72,
+      "price": 891.28,
       "ath": 1153.99,
       "high52": 1153.99,
-      "belowATH": 23.8538,
-      "below52": 23.8538,
-      "priceDate": "2026-10-14"
+      "belowATH": 22.7654,
+      "below52": 22.7654,
+      "priceDate": "2026-10-15"
     },
     "IONQ": {
-      "price": 31.42,
+      "price": 34.35,
       "ath": 84.64,
-      "high52": 80.23,
-      "belowATH": 62.8781,
-      "below52": 60.8376,
-      "priceDate": "2026-10-14"
+      "high52": 73.87,
+      "belowATH": 59.4164,
+      "below52": 53.4994,
+      "priceDate": "2026-10-15"
     },
     "LITE": {
-      "price": 896.33,
+      "price": 869.54,
       "ath": 1143.0,
       "high52": 1143.0,
-      "belowATH": 21.5809,
-      "below52": 21.5809,
-      "priceDate": "2026-10-14"
+      "belowATH": 23.9248,
+      "below52": 23.9248,
+      "priceDate": "2026-10-15"
     },
     "LLY": {
-      "price": 1208.74,
+      "price": 1251.61,
       "ath": 1292.65,
       "high52": 1292.65,
-      "belowATH": 6.4913,
-      "below52": 6.4913,
-      "priceDate": "2026-10-14"
+      "belowATH": 3.1749,
+      "below52": 3.1749,
+      "priceDate": "2026-10-15"
     },
     "META": {
-      "price": 737.54,
+      "price": 736.72,
       "ath": 796.25,
       "high52": 779.82,
-      "belowATH": 7.3733,
-      "below52": 5.4218,
-      "priceDate": "2026-10-14"
+      "belowATH": 7.4763,
+      "below52": 5.5269,
+      "priceDate": "2026-10-15"
     },
     "MSFT": {
-      "price": 533.69,
+      "price": 539.44,
       "ath": 555.45,
       "high52": 553.72,
-      "belowATH": 3.9175,
-      "below52": 3.6173,
-      "priceDate": "2026-10-14"
+      "belowATH": 2.8823,
+      "below52": 2.5789,
+      "priceDate": "2026-10-15"
     },
     "MU": {
-      "price": 914.13,
+      "price": 931.24,
       "ath": 1255.0,
       "high52": 1255.0,
-      "belowATH": 27.161,
-      "below52": 27.161,
-      "priceDate": "2026-10-14"
+      "belowATH": 25.7976,
+      "below52": 25.7976,
+      "priceDate": "2026-10-15"
     },
     "NVDA": {
-      "price": 221.3,
+      "price": 217.23,
       "ath": 243.37,
       "high52": 243.37,
-      "belowATH": 9.0685,
-      "below52": 9.0685,
-      "priceDate": "2026-10-14"
+      "belowATH": 10.7408,
+      "below52": 10.7408,
+      "priceDate": "2026-10-15"
     },
     "PLTR": {
-      "price": 200.97,
+      "price": 200.5,
       "ath": 212.94,
       "high52": 212.94,
-      "belowATH": 5.6213,
-      "below52": 5.6213,
-      "priceDate": "2026-10-14"
+      "belowATH": 5.842,
+      "below52": 5.842,
+      "priceDate": "2026-10-15"
     },
     "SNDK": {
-      "price": 1403.34,
+      "price": 1394.83,
       "ath": 2354.3899,
       "high52": 2354.3899,
-      "belowATH": 40.3948,
-      "below52": 40.3948,
-      "priceDate": "2026-10-14"
+      "belowATH": 40.7562,
+      "below52": 40.7562,
+      "priceDate": "2026-10-15"
     },
     "SPCX": {
-      "price": 152.16,
+      "price": 148.62,
       "ath": 225.64,
       "high52": 225.64,
-      "belowATH": 32.5651,
-      "below52": 32.5651,
-      "priceDate": "2026-10-14"
+      "belowATH": 34.134,
+      "below52": 34.134,
+      "priceDate": "2026-10-15"
     }
   }
 }
